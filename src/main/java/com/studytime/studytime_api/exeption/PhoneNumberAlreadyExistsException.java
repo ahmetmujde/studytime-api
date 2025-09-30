@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.CONFLICT)
 public class PhoneNumberAlreadyExistsException extends BaseBusinessException{
     public PhoneNumberAlreadyExistsException(String phoneNumber) {
-        super("Phone number already exist: "+ phoneNumber, HttpStatus.CONFLICT);
+        super("Phone number already exist: "+ phoneNumber);
     }
 }

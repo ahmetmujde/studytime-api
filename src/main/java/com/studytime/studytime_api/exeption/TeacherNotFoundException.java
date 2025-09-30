@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(HttpStatus.NOT_FOUND)
 public class TeacherNotFoundException extends  BaseBusinessException {
-    public TeacherNotFoundException(String message, HttpStatus status) {
-        super(message, status);
+    public TeacherNotFoundException(String message) {
+        super(message);
     }
 }
 

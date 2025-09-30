@@ -1,68 +1,34 @@
 package com.studytime.studytime_api.exeption;
 
 
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-@ControllerAdvice
-public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+@RestControllerAdvice
+public class GlobalExceptionHandler {
 
-    @ExceptionHandler(BaseBusinessException.class)
-    public ResponseEntity<ApiError> handleBusinessException(
-            BaseBusinessException ex,
-            WebRequest request) {
-
-        ApiError apiError = new ApiError(
-                ex.getStatus().value(),
-                ex.getStatus().getReasonPhrase(),
-                ex.getMessage(),
-                ((ServletWebRequest) request).getRequest().getRequestURI(),
-                LocalDateTime.now(),
-                null
-        );
-
-        return new ResponseEntity<>(apiError, ex.getStatus());
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleAllExceptions(Exception ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Unexpected error occurred");
+        error.put("message", ex.getMessage());
+        return error;
     }
 
-
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(
-            MethodArgumentNotValidException ex,
-            HttpHeaders headers,
-            HttpStatusCode status,
-            WebRequest request) {
-
-        Map<String, String> fieldErrors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String message = error.getDefaultMessage();
-            fieldErrors.put(fieldName, message);
-        });
-
-        ApiError apiError = new ApiError(
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Failed",
-                "Some fields are invalid",
-                ((ServletWebRequest) request).getRequest().getRequestURI(),
-                LocalDateTime.now(),
-                fieldErrors
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationErrors(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(err ->
+                errors.put(err.getField(), err.getDefaultMessage())
         );
-
-        return new ResponseEntity<>(apiError, HttpStatus.BAD_REQUEST);
+        return errors;
     }
-
 }

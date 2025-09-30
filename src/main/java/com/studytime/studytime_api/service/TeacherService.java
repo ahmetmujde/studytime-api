@@ -5,17 +5,20 @@ import com.studytime.studytime_api.dto.response.TeacherSummaryResponseDTO;
 import com.studytime.studytime_api.entity.Teacher;
 import com.studytime.studytime_api.exeption.EmailAlreadyExistsException;
 import com.studytime.studytime_api.exeption.PhoneNumberAlreadyExistsException;
+import com.studytime.studytime_api.exeption.TeacherNotFoundException;
 import com.studytime.studytime_api.repository.TeacherRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TeacherService {
     private final TeacherRepository teacherRepository;
+    private final ModelMapper modelMapper;
 
-    public TeacherService(TeacherRepository teacherRepository) {
+    public TeacherService(TeacherRepository teacherRepository, ModelMapper modelMapper) {
         this.teacherRepository = teacherRepository;
+        this.modelMapper = modelMapper;
     }
-
 
     public TeacherSummaryResponseDTO saveTeacher(TeacherSummaryRequestDTO teacherSummaryRequestDTO) {
         if (teacherRepository.existsByEmail(teacherSummaryRequestDTO.getEmail())) {
@@ -26,22 +29,15 @@ public class TeacherService {
             throw new PhoneNumberAlreadyExistsException(teacherSummaryRequestDTO.getPhoneNumber());
         }
 
-        Teacher teacher = new Teacher();
-        teacher.setFirstName(teacherSummaryRequestDTO.getFirstName());
-        teacher.setLastName(teacherSummaryRequestDTO.getLastName());
-        teacher.setPhoneNumber(teacherSummaryRequestDTO.getPhoneNumber());
-        teacher.setEmail(teacherSummaryRequestDTO.getEmail());
+        Teacher teacher = modelMapper.map(teacherSummaryRequestDTO,Teacher.class);
 
         Teacher savedTeacher = teacherRepository.save(teacher);
 
-        TeacherSummaryResponseDTO teacherSummaryResponseDTO = new TeacherSummaryResponseDTO();
+        return modelMapper.map(savedTeacher,TeacherSummaryResponseDTO.class);
+    }
 
-        teacherSummaryResponseDTO.setId(savedTeacher.getId().toString());
-        teacherSummaryResponseDTO.setFirstname(savedTeacher.getFirstName());
-        teacherSummaryResponseDTO.setLastname(savedTeacher.getLastName());
-        teacherSummaryResponseDTO.setPhoneNumber(savedTeacher.getPhoneNumber());
-        teacherSummaryResponseDTO.setEmail(savedTeacher.getEmail());
-
-        return teacherSummaryResponseDTO;
+    public Teacher getTeacherById(Long teacherId) {
+        return teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + teacherId));
     }
 }

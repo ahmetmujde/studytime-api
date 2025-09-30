@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.CONFLICT)
 public class PlanTitleAlreadyExistsException extends  BaseBusinessException{
 
-    public PlanTitleAlreadyExistsException(String message, HttpStatus status) {
-        super(message, status);
+    public PlanTitleAlreadyExistsException(String message) {
+        super(message);
     }
 }
