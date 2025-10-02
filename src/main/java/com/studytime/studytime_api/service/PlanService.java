@@ -10,6 +10,8 @@ import com.studytime.studytime_api.repository.PlanRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PlanService {
 
@@ -43,6 +45,13 @@ public class PlanService {
         responseDTO.setTeacherSummaryResponseDTO(teacherSummary);
 
         return responseDTO;
+    }
+
+    public List<PlanResponseDTO> findAllPlansByTeacherId(Long teacherId) {
+        List<Plan> allPlansByTeacherId = planRepository.findAllByTeacherId(teacherId);
+        return allPlansByTeacherId.stream()
+                .map(plan -> modelMapper.map(plan, PlanResponseDTO.class))
+                .toList();
     }
 }
 
