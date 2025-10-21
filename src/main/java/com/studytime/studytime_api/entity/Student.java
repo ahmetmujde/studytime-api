@@ -36,6 +36,9 @@ public class Student {
     @NotBlank(message = "Email cannot be blank!")
     private String email;
 
+    @Column(name = "phone_number",length = 12)
+    private String phoneNumber;
+
     @OneToMany(mappedBy = "student", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Purchase> purchases;
 }

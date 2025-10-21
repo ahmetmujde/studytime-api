@@ -29,7 +29,7 @@ public class Teacher {
     @NotBlank(message = "Email name cannot be blank!")
     private String email;
 
-    @Column(name = "phone_number",nullable = false, length = 20)
+    @Column(name = "phone_number",nullable = false, length = 12)
     @NotBlank(message = "Phone number name cannot be blank!")
     private String phoneNumber;
 
