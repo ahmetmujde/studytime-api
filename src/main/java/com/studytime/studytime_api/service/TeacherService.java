@@ -3,8 +3,6 @@ package com.studytime.studytime_api.service;
 import com.studytime.studytime_api.dto.request.TeacherSummaryRequestDTO;
 import com.studytime.studytime_api.dto.response.TeacherSummaryResponseDTO;
 import com.studytime.studytime_api.entity.Teacher;
-import com.studytime.studytime_api.exeption.EmailAlreadyExistsException;
-import com.studytime.studytime_api.exeption.PhoneNumberAlreadyExistsException;
 import com.studytime.studytime_api.exeption.TeacherNotFoundException;
 import com.studytime.studytime_api.repository.TeacherRepository;
 import org.modelmapper.ModelMapper;
@@ -14,17 +12,21 @@ import java.util.List;
 
 @Service
 public class TeacherService {
-    private final TeacherRepository teacherRepository;
     private final ModelMapper modelMapper;
+    private final TeacherRepository teacherRepository;
+    private final UserValidationService userValidationService;
 
-    public TeacherService(TeacherRepository teacherRepository, ModelMapper modelMapper) {
+    public TeacherService( ModelMapper modelMapper,
+                           TeacherRepository teacherRepository,
+                           UserValidationService userValidationService) {
         this.teacherRepository = teacherRepository;
         this.modelMapper = modelMapper;
+        this.userValidationService = userValidationService;
     }
 
     public TeacherSummaryResponseDTO saveTeacher(TeacherSummaryRequestDTO teacherSummaryRequestDTO) {
-        isTeacherExistByEmail(teacherSummaryRequestDTO.getEmail());
-        isTeacherExistByPhoneNumber(teacherSummaryRequestDTO.getPhoneNumber());
+        userValidationService.checkEmailNotUsed(teacherSummaryRequestDTO.getEmail());
+        userValidationService.checkPhoneNotUsed(teacherSummaryRequestDTO.getPhoneNumber());
 
         Teacher teacher = modelMapper.map(teacherSummaryRequestDTO,Teacher.class);
         Teacher savedTeacher = teacherRepository.save(teacher);
@@ -39,23 +41,14 @@ public class TeacherService {
                 .toList();
     }
 
+    public TeacherSummaryResponseDTO findTeacherByID(Long teacherID) {
+        Teacher teacher = getTeacherById(teacherID);
+        return modelMapper.map(teacher, TeacherSummaryResponseDTO.class);
+    }
+
     public Teacher getTeacherById(Long teacherId) {
         return teacherRepository.findById(teacherId)
-                .orElseThrow(() -> new TeacherNotFoundException("Teacher not found with id: " + teacherId));
+                .orElseThrow(() -> new TeacherNotFoundException(teacherId));
     }
-
-
-    public void isTeacherExistByEmail(String email) {
-        if (teacherRepository.existsByEmail(email)) {
-            throw new EmailAlreadyExistsException(email);
-        }
-    }
-
-    public void isTeacherExistByPhoneNumber(String phoneNumber) {
-        if (teacherRepository.existsByPhoneNumber(phoneNumber)) {
-            throw new PhoneNumberAlreadyExistsException(phoneNumber);
-        }
-    }
-
 
 }

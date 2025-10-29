@@ -6,12 +6,14 @@ import com.studytime.studytime_api.service.TeacherService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/teachers")
@@ -30,13 +32,20 @@ public class TeacherController {
 
     @GetMapping
     public ResponseEntity<List<TeacherSummaryResponseDTO>> findAllTeacher() {
-        List<TeacherSummaryResponseDTO> teachers = teacherService.findAllTeachers();
-
-        if (teachers.isEmpty()) {
+        List<TeacherSummaryResponseDTO> teachersDTO = teacherService.findAllTeachers();
+        if (teachersDTO.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+        return ResponseEntity.ok(teachersDTO);
+    }
 
-        return ResponseEntity.ok(teachers);
+    @GetMapping("/{teacherId}")
+    public ResponseEntity<TeacherSummaryResponseDTO> findAllTeacher(@PathVariable Long teacherId) {
+        TeacherSummaryResponseDTO teacherDTO = teacherService.findTeacherByID(teacherId);
+        if (Objects.isNull(teacherDTO)) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(teacherDTO);
     }
 
 }
