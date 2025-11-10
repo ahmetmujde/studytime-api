@@ -7,6 +7,8 @@ import com.studytime.studytime_api.repository.StudentRepository;
 import com.studytime.studytime_api.repository.TeacherRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class UserValidationService {
     private final StudentRepository studentRepository;
@@ -27,5 +29,13 @@ public class UserValidationService {
         if (studentRepository.existsByPhoneNumber(phoneNumber) || teacherRepository.existsByPhoneNumber(phoneNumber)) {
             throw new PhoneNumberAlreadyExistsException(phoneNumber);
         }
+    }
+
+    public boolean isSameEmail(String currentEmail, String newEmail) {
+        return Objects.equals(currentEmail, newEmail);
+    }
+
+    public boolean isSamePhoneNumber(String currentPhoneNumber, String newPhoneNumber) {
+        return Objects.equals(currentPhoneNumber, newPhoneNumber);
     }
 }

@@ -1,7 +1,7 @@
 package com.studytime.studytime_api.service;
 
-import com.studytime.studytime_api.dto.request.TeacherSummaryRequestDTO;
-import com.studytime.studytime_api.dto.response.TeacherSummaryResponseDTO;
+import com.studytime.studytime_api.dto.request.TeacherSummaryRequestDto;
+import com.studytime.studytime_api.dto.response.TeacherSummaryResponseDto;
 import com.studytime.studytime_api.entity.Teacher;
 import com.studytime.studytime_api.exeption.TeacherNotFoundException;
 import com.studytime.studytime_api.repository.TeacherRepository;
@@ -24,26 +24,47 @@ public class TeacherService {
         this.userValidationService = userValidationService;
     }
 
-    public TeacherSummaryResponseDTO saveTeacher(TeacherSummaryRequestDTO teacherSummaryRequestDTO) {
+    public TeacherSummaryResponseDto createTeacher(TeacherSummaryRequestDto teacherSummaryRequestDTO) {
         userValidationService.checkEmailNotUsed(teacherSummaryRequestDTO.getEmail());
         userValidationService.checkPhoneNotUsed(teacherSummaryRequestDTO.getPhoneNumber());
 
         Teacher teacher = modelMapper.map(teacherSummaryRequestDTO,Teacher.class);
         Teacher savedTeacher = teacherRepository.save(teacher);
 
-        return modelMapper.map(savedTeacher,TeacherSummaryResponseDTO.class);
+        return modelMapper.map(savedTeacher, TeacherSummaryResponseDto.class);
     }
 
-    public List<TeacherSummaryResponseDTO> findAllTeachers() {
+    public List<TeacherSummaryResponseDto> getAllTeachers() {
         List<Teacher> allTeachers = teacherRepository.findAll();
+
         return allTeachers.stream()
-                .map(teacher -> modelMapper.map(teacher, TeacherSummaryResponseDTO.class))
+                .map(teacher -> modelMapper.map(teacher, TeacherSummaryResponseDto.class))
                 .toList();
     }
 
-    public TeacherSummaryResponseDTO findTeacherByID(Long teacherID) {
+    public TeacherSummaryResponseDto updateTeacher(Long id, TeacherSummaryRequestDto dto) {
+        Teacher teacher = getTeacherById(id);
+
+        if (!userValidationService.isSameEmail(teacher.getEmail(), dto.getEmail())) {
+            userValidationService.checkEmailNotUsed(dto.getEmail());
+        }
+
+        if (!userValidationService.isSamePhoneNumber(teacher.getPhoneNumber(), dto.getPhoneNumber())) {
+            userValidationService.checkPhoneNotUsed(dto.getPhoneNumber());
+        }
+
+        teacher.setEmail(dto.getEmail());
+        teacher.setPhoneNumber(dto.getPhoneNumber());
+        teacher.setFirstName(dto.getFirstName());
+        teacher.setLastName(dto.getLastName());
+
+        Teacher updatedTeacher = teacherRepository.save(teacher);
+        return modelMapper.map(updatedTeacher, TeacherSummaryResponseDto.class);
+    }
+
+    public TeacherSummaryResponseDto getTeacherDtoById(Long teacherID) {
         Teacher teacher = getTeacherById(teacherID);
-        return modelMapper.map(teacher, TeacherSummaryResponseDTO.class);
+        return modelMapper.map(teacher, TeacherSummaryResponseDto.class);
     }
 
     public Teacher getTeacherById(Long teacherId) {

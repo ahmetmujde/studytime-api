@@ -1,8 +1,8 @@
 package com.studytime.studytime_api.controller;
 
 
-import com.studytime.studytime_api.dto.request.PlanRequestDTO;
-import com.studytime.studytime_api.dto.response.PlanResponseDTO;
+import com.studytime.studytime_api.dto.request.PlanRequestDto;
+import com.studytime.studytime_api.dto.response.PlanResponseDto;
 import com.studytime.studytime_api.service.PlanService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +25,14 @@ public class PlanController {
     }
 
     @PostMapping
-    public ResponseEntity<PlanResponseDTO> create(@RequestParam Long teacherId, @Valid @RequestBody PlanRequestDTO planRequestDTO){
-        PlanResponseDTO createdPlan = planService.create(teacherId,planRequestDTO);
+    public ResponseEntity<PlanResponseDto> create(@RequestParam Long teacherId, @Valid @RequestBody PlanRequestDto planRequestDTO){
+        PlanResponseDto createdPlan = planService.create(teacherId,planRequestDTO);
         return ResponseEntity.ok(createdPlan);
     }
 
     @GetMapping
-    public ResponseEntity<List<PlanResponseDTO>> findAllPlanByTeacherId(@RequestParam Long teacherId){
-        List<PlanResponseDTO> allPlansByTeacherId = planService.findAllPlansByTeacherId(teacherId);
+    public ResponseEntity<List<PlanResponseDto>> findAllPlanByTeacherId(@RequestParam Long teacherId){
+        List<PlanResponseDto> allPlansByTeacherId = planService.findAllPlansByTeacherId(teacherId);
 
         if (allPlansByTeacherId.isEmpty())
             return ResponseEntity.noContent().build();

@@ -1,8 +1,8 @@
 package com.studytime.studytime_api.service;
 
-import com.studytime.studytime_api.dto.request.PlanRequestDTO;
-import com.studytime.studytime_api.dto.response.PlanResponseDTO;
-import com.studytime.studytime_api.dto.response.TeacherSummaryResponseDTO;
+import com.studytime.studytime_api.dto.request.PlanRequestDto;
+import com.studytime.studytime_api.dto.response.PlanResponseDto;
+import com.studytime.studytime_api.dto.response.TeacherSummaryResponseDto;
 import com.studytime.studytime_api.entity.Plan;
 import com.studytime.studytime_api.entity.Teacher;
 import com.studytime.studytime_api.exeption.PlanTitleAlreadyExistsException;
@@ -27,7 +27,7 @@ public class PlanService {
         this.modelMapper = modelMapper;
     }
 
-    public PlanResponseDTO create(Long teacherId, PlanRequestDTO planRequestDTO) {
+    public PlanResponseDto create(Long teacherId, PlanRequestDto planRequestDTO) {
         Teacher teacher = teacherService.getTeacherById(teacherId);
 
         if (planRepository.existsByTeacherAndTitle(teacher, planRequestDTO.getTitle())) {
@@ -39,18 +39,18 @@ public class PlanService {
 
         Plan savedPlan = planRepository.save(plan);
 
-        PlanResponseDTO responseDTO = modelMapper.map(savedPlan, PlanResponseDTO.class);
+        PlanResponseDto responseDTO = modelMapper.map(savedPlan, PlanResponseDto.class);
 
-        TeacherSummaryResponseDTO teacherSummary = modelMapper.map(savedPlan.getTeacher(), TeacherSummaryResponseDTO.class);
+        TeacherSummaryResponseDto teacherSummary = modelMapper.map(savedPlan.getTeacher(), TeacherSummaryResponseDto.class);
         responseDTO.setTeacherSummaryResponseDTO(teacherSummary);
 
         return responseDTO;
     }
 
-    public List<PlanResponseDTO> findAllPlansByTeacherId(Long teacherId) {
+    public List<PlanResponseDto> findAllPlansByTeacherId(Long teacherId) {
         List<Plan> allPlansByTeacherId = planRepository.findAllByTeacherId(teacherId);
         return allPlansByTeacherId.stream()
-                .map(plan -> modelMapper.map(plan, PlanResponseDTO.class))
+                .map(plan -> modelMapper.map(plan, PlanResponseDto.class))
                 .toList();
     }
 }

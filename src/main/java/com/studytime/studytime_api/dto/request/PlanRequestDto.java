@@ -7,7 +7,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Data;
 
 @Data
-public class PlanRequestDTO {
+public class PlanRequestDto {
 
     @NotBlank(message = "Title cannot be blank!")
     private String title;
